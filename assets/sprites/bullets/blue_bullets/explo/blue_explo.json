@@ -1,0 +1,146 @@
+{
+	"textures": [
+		{
+			"image": "blue_explo.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 719,
+				"h": 255
+			},
+			"scale": 1,
+			"frames": [
+				{
+					"filename": "BlueBulletExplo_6.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 228,
+						"h": 246
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 228,
+						"h": 246
+					},
+					"frame": {
+						"x": 1,
+						"y": 1,
+						"w": 228,
+						"h": 246
+					}
+				},
+				{
+					"filename": "BlueBulletExplo_5.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 197,
+						"h": 196
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 197,
+						"h": 196
+					},
+					"frame": {
+						"x": 231,
+						"y": 1,
+						"w": 197,
+						"h": 196
+					}
+				},
+				{
+					"filename": "BlueBulletExplo_4.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 148,
+						"h": 149
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 148,
+						"h": 149
+					},
+					"frame": {
+						"x": 430,
+						"y": 1,
+						"w": 148,
+						"h": 149
+					}
+				},
+				{
+					"filename": "BlueBulletExplo_1.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 61,
+						"h": 61
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 61,
+						"h": 61
+					},
+					"frame": {
+						"x": 430,
+						"y": 152,
+						"w": 61,
+						"h": 61
+					}
+				},
+				{
+					"filename": "BlueBulletExplo_3.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 138,
+						"h": 138
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 138,
+						"h": 138
+					},
+					"frame": {
+						"x": 580,
+						"y": 1,
+						"w": 138,
+						"h": 138
+					}
+				},
+				{
+					"filename": "BlueBulletExplo_2.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 113,
+						"h": 113
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 113,
+						"h": 113
+					},
+					"frame": {
+						"x": 580,
+						"y": 141,
+						"w": 113,
+						"h": 113
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:e611cab11cb759e37e165336311d1da1:549787fbf83d506067321cca697cfba8:7f2667daabff090316120ab05396f0db$"
+	}
+}

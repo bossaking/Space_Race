@@ -5,12 +5,27 @@ class MainScene extends Phaser.Scene {
 
     constructor() {
         super();
+
+        this.enemyGroup;
+        this.easyEnemyGroup;
+        this.normalEnemyGroup;
+        this.hardEnemyGroup;
+
+        this.spawnEnemyEvent;
+
+        this.gameLevel;
+
+        this.levelText;
+
         this.bulletGroup;
         this.blastGroup;
-        this.enemyGroup;
+        
+        this.bonusGroup;
         this.player;
         this.scoreText;
         this.score;
+
+        this.superShootText;
 
         this.hpBackgrnd;
         this.hpBar;
@@ -18,7 +33,16 @@ class MainScene extends Phaser.Scene {
         this.energyBackgrnd;
         this.energyBar;
 
+        this.shieldBackgrnd;
+        this.shieldBar;
+
         this.easyEnemies = [];
+        this.normalEnemies = [];
+        this.hardEnemies = [];
+
+        this.spawnPoints = [];
+
+        this.bonuses = [];
     }
 
     preload() {
@@ -43,20 +67,51 @@ class MainScene extends Phaser.Scene {
 
         this.load.atlas("orangeBlast", "assets/sprites/bullets/orange_blast/orange_blasts.png", "assets/sprites/bullets/orange_blast/orange_blasts.json");
 
+        this.load.atlas("blueBulletExplo", "assets/sprites/bullets/blue_bullets/explo/blue_explo.png", "assets/sprites/bullets/blue_bullets/explo/blue_explo.json");
+
+        this.load.atlas("orangeBlastExplo", "assets/sprites/bullets/orange_blast/explo/blast_explo.png", "assets/sprites/bullets/orange_blast/explo/blast_explo.json");
+
         //load hp bar background image
         this.load.image('hpBackgrnd', 'assets/sprites/gui/hp/Health_1.png');
 
         //load energy bar background image
         this.load.image('energyBackgrnd', 'assets/sprites/gui/energy/Energy_1.png');
 
+        //load shield bar background image
+        this.load.image('shieldBackgrnd', 'assets/sprites/gui/shield/Shield.png');
 
         //load easy enemy images
-        let enemy1 = this.load.image('easyEnemy1', 'assets/sprites/enemy/easy/Drone_4.png');
-        let enemy2 = this.load.image('easyEnemy2', 'assets/sprites/enemy/easy/Drone_5.png');
-        let enemy3 = this.load.image('easyEnemy3', 'assets/sprites/enemy/easy/Drone_9.png');
+        this.load.image('easyEnemy1', 'assets/sprites/enemy/easy/Drone_4.png');
+        this.load.image('easyEnemy2', 'assets/sprites/enemy/easy/Drone_5.png');
+        this.load.image('easyEnemy3', 'assets/sprites/enemy/easy/Drone_9.png');
         this.easyEnemies.push('easyEnemy1');
         this.easyEnemies.push('easyEnemy2');
         this.easyEnemies.push('easyEnemy3');
+
+        //load normal enemies images
+        this.load.image('normalEnemy1', 'assets/sprites/enemy/normal/Ship_1.png');
+        this.load.image('normalEnemy2', 'assets/sprites/enemy/normal/Ship_2.png');
+        this.load.image('normalEnemy3', 'assets/sprites/enemy/normal/Ship_3.png');
+        this.normalEnemies.push('normalEnemy1');
+        this.normalEnemies.push('normalEnemy2');
+        this.normalEnemies.push('normalEnemy3');
+
+        //load hard enemies images
+        this.load.image('hardEnemy1', 'assets/sprites/enemy/hard/Ship_1.png');
+        this.load.image('hardEnemy2', 'assets/sprites/enemy/hard/Ship_2.png');
+        this.load.image('hardEnemy3', 'assets/sprites/enemy/hard/Ship_3.png');
+        this.hardEnemies.push('hardEnemy1');
+        this.hardEnemies.push('hardEnemy2');
+        this.hardEnemies.push('hardEnemy3');
+
+        //load bonuses images
+        this.load.image('hpBonus', 'assets/sprites/bonuses/Item_1.png');
+        this.load.image('shieldBonus', 'assets/sprites/bonuses/Item_2.png');
+        this.load.image('energyBonus', 'assets/sprites/bonuses/Item_3.png');
+        this.bonuses.push('hpBonus');
+        this.bonuses.push('shieldBonus');
+        this.bonuses.push('energyBonus');
+
     }
 
 
@@ -74,15 +129,24 @@ class MainScene extends Phaser.Scene {
 
         this.blastGroup = new BlastGroup(this);
 
-        this.enemyGroup = new EnemyGroup(this);
+        this.enemyGroup = new EasyEnemyGroup(this);
+
+        this.bonusGroup = new BonusGroup(this);
 
         this.initializePlayer(widnowHeight);
 
         this.initializeHpBar(windowWidth);
 
-        this.initializeEnergyBar();
+        this.initializeEnergyBar(windowWidth);
 
-        this.initializeEasyEnemies(widnowHeight, windowWidth);
+        this.initializeShieldBar(windowWidth);
+        
+        this.initializeSpawnPoints();
+        
+
+        this.initializeColliders();
+
+        
 
         //Create player blue bullets animation
         this.anims.create({
@@ -93,7 +157,7 @@ class MainScene extends Phaser.Scene {
         });
 
 
-        //Create player orange blast animation animation
+        //Create player orange blast animation
         this.anims.create({
             key: 'blastFly',
             frames: this.anims.generateFrameNames('orangeBlast', {
@@ -107,7 +171,33 @@ class MainScene extends Phaser.Scene {
             repeat: -1
         });
 
-    
+        //Create blue bullets explosion animation
+        this.anims.create({
+            key: 'blueExplo',
+            frames: this.anims.generateFrameNames('blueBulletExplo', {
+                start: 0,
+                end: 6,
+                zeroPad: 1,
+                prefix: 'BlueBulletExplo_',
+                suffix: '.png'
+            }),
+            frameRate: 30,
+            repeat: 0
+        });
+
+        this.anims.create({
+            key: 'blastExplo',
+            frames: this.anims.generateFrameNames('orangeBlastExplo', {
+                start: 0,
+                end: 11,
+                zeroPad: 3,
+                prefix: 'Explo__',
+                suffix: '.png'
+            }),
+            frameRate: 20,
+            repeat: 0
+        });
+
         //enable window borders colliders
         this.physics.world.setBoundsCollision(true, true, true, true);
 
@@ -117,8 +207,50 @@ class MainScene extends Phaser.Scene {
         //Create score text
         this.scoreText = this.add.text(windowWidth / 2 - 128, 32, 'Score: 0', { fontSize: '32px', fill: '#FFF', fontFamily: '"Goblin One", cursive' });
 
+        //Create super shoot prompt text
+        this.superShootText = this.add.text(windowWidth / 2 - 400, 128, '', { fontSize: '32px', fill: '#e63410', fontFamily: '"Goblin One", cursive' });
+
+        //Crate level difficulty text
+        this.levelText = this.add.text(800, 256, '', { fontSize: '64px', fill: '#e63410', fontFamily: '"Goblin One", cursive' });
+        this.levelText.setOrigin(0.5);
+
         this.initializeLoopEvents();
 
+        this.spawnEnemy();
+
+    }
+
+    initializeColliders(){
+        this.physics.add.overlap(this.bulletGroup, this.enemyGroup, this.blueBulletPlayerHit, null, this);
+        this.physics.add.overlap(this.blastGroup, this.enemyGroup, this.orangeBlastPlayerHit, null, this);
+        this.physics.add.overlap(this.player, this.bonusGroup, this.playerBonusHit, null, this);
+        this.physics.add.overlap(this.player, this.enemyGroup, this.playerEnemyHit, null, this);
+    }
+
+    blueBulletPlayerHit(bullet, enemy) {
+        if (bullet.enable && enemy.enable) {
+            enemy.receiveDamage(10);
+            bullet.explo();
+        }
+    }
+
+    orangeBlastPlayerHit(blast, enemy){
+        if(blast.enable){
+            enemy.receiveDamage(40);
+            blast.explo();
+        }
+    }
+
+    playerBonusHit(player, bonus){
+        player.receiveBonus(bonus.texture.key);
+        bonus.destroy();
+    }
+
+    playerEnemyHit(player, enemy){
+        if(enemy.enable){
+            player.receiveDamage(enemy.collisionDamage);
+            enemy.playerCollision();
+        }
     }
 
     initializePlayer(widnowHeight) {
@@ -137,26 +269,59 @@ class MainScene extends Phaser.Scene {
 
     }
 
-    initializeEasyEnemies(widnowHeight, windowWidthd){
+    spawnEnemy() {
 
-        this.enemyGroup.spawn(800, 500);
+        switch(this.gameLevel){
 
-    }
+            case undefined:
+                this.spawnEnemyEvent = this.time.addEvent({ delay: 1200, callback: this.spawnEnemy, callbackScope: this, loop: true });
+                this.gameLevel = 'easy';
+            break;
 
-    spawnEasyEnemy(){
-        this.enemyGroup.spawn(1600, 500);
+            case 'easy':
+                if(this.score >= 500){
+                    this.spawnEnemyEvent.remove(false);
+                    this.gameLevel = 'normal';
+                    this.enemyGroup = new NormalEnemyGroup(this);
+                    this.levelText.setText('NORMAL LEVEL');
+                    this.initializeColliders();
+                    this.spawnEnemyEvent = this.time.addEvent({ delay: 1700, callback: this.spawnEnemy, callbackScope: this, loop: true });
+                    return;
+                }
+            break;
+
+            case 'normal':
+                if(this.score >= 1000){
+                    this.spawnEnemyEvent.remove(false);
+                    this.gameLevel = 'hard';
+                    this.enemyGroup = new HardEnemyGroup(this);
+                    this.levelText.setText('HARD LEVEL');
+                    this.initializeColliders();
+                    this.spawnEnemyEvent = this.time.addEvent({ delay: 2200, callback: this.spawnEnemy, callbackScope: this, loop: true });
+                    return;
+                }
+            break;
+
+        }
+
+        if(this.levelText !== ''){
+            this.levelText.setText('');
+        }
+
+        let spawnPoint = Phaser.Utils.Array.GetRandom(this.spawnPoints);
+        this.enemyGroup.spawn(spawnPoint.x, spawnPoint.y);
     }
 
     initializeHpBar(windowWidth) {
         //hp bar background sprite and size
-        this.hpBackgrnd = this.add.image(windowWidth - 256, 50, 'hpBackgrnd');
+        this.hpBackgrnd = this.add.image(200, 50, 'hpBackgrnd');
         this.hpBackgrnd.setDisplaySize(256, 64);
 
         //hp bar graphics and size
         this.hpBar = this.add.graphics();
         this.hpBar.fillStyle('0xe139e9', 1);
         this.hpBar.fillRect(0, 0, 170, 30);
-        this.hpBar.x = windowWidth - 310;
+        this.hpBar.x = 145;
         this.hpBar.y = 35;
 
         this.actualizeHpBar();
@@ -167,16 +332,16 @@ class MainScene extends Phaser.Scene {
         this.hpBar.scaleX = this.player.hp / 100;
     }
 
-    initializeEnergyBar() {
+    initializeEnergyBar(windowWidth) {
         //energy bar background sprite and size
-        this.energyBackgrnd = this.add.image(256, 50, 'energyBackgrnd');
+        this.energyBackgrnd = this.add.image(windowWidth - 256, 50, 'energyBackgrnd');
         this.energyBackgrnd.setDisplaySize(256, 64);
 
         //energy bar graphics and size
         this.energyBar = this.add.graphics();
         this.energyBar.fillStyle('0x80d9ff', 1);
         this.energyBar.fillRect(0, 0, 170, 30);
-        this.energyBar.x = 200;
+        this.energyBar.x = windowWidth - 310;
         this.energyBar.y = 35;
 
         this.actualizeEnergyBar();
@@ -186,14 +351,60 @@ class MainScene extends Phaser.Scene {
         this.energyBar.scaleX = this.player.energy / 100;
     }
 
+    initializeShieldBar(windowWidth) {
+        //shield bar background sprite and size
+        this.shieldBackgrnd = this.add.image(480, 50, 'shieldBackgrnd');
+        this.shieldBackgrnd.setDisplaySize(256, 64);
+
+        //shield bar graphics and size
+        this.shieldBar = this.add.graphics();
+        this.shieldBar.fillStyle('0xe6e6e6', 1);
+        this.shieldBar.fillRect(0, 0, 170, 30);
+        this.shieldBar.x = 425;
+        this.shieldBar.y = 35;
+
+        this.actualizeShieldBar();
+    }
+
+    actualizeShieldBar() {
+        this.shieldBar.scaleX = this.player.shield / 100;
+    }
+
+    initializeSpawnPoints() {
+
+        let spawnPoint1 = {};
+        spawnPoint1.x = 1800;
+        spawnPoint1.y = 200;
+        this.spawnPoints.push(spawnPoint1);
+
+        let spawnPoint2 = {};
+        spawnPoint2.x = 1800;
+        spawnPoint2.y = 300;
+        this.spawnPoints.push(spawnPoint2);
+
+        let spawnPoint3 = {};
+        spawnPoint3.x = 1800;
+        spawnPoint3.y = 400;
+        this.spawnPoints.push(spawnPoint3);
+
+        let spawnPoint4 = {};
+        spawnPoint4.x = 1800;
+        spawnPoint4.y = 500;
+        this.spawnPoints.push(spawnPoint4);
+
+        let spawnPoint5 = {};
+        spawnPoint5.x = 1800;
+        spawnPoint5.y = 600;
+        this.spawnPoints.push(spawnPoint5);
+
+    }
+
     initializeLoopEvents() {
         //Loop calling increase score function
         this.time.addEvent({ delay: 100, callback: this.increaseScore, callbackScope: this, loop: true });
 
         //Loop calling increase player energy accumulate function
         this.time.addEvent({ delay: 1000, callback: this.player.accumulateEnergy, callbackScope: this.player, loop: true });
-
-        this.time.addEvent({ delay: 2000, callback: this.spawnEasyEnemy, callbackScope: this, loop: true });
     }
 
     update() {
@@ -227,7 +438,13 @@ class MainScene extends Phaser.Scene {
         this.scoreText.setText('Score: ' + this.score);
     }
 
+    showSuperShootPrompt(){
+        this.superShootText.setText('press ENTER for SUPER SHOOT!');
+    }
 
+    hideSuperShootPrompt(){
+        this.superShootText.setText('');
+    }
 }
 
 class Player extends Phaser.Physics.Arcade.Sprite {
@@ -239,6 +456,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.scene.add.existing(this);
         this.hp;
         this.energy;
+        this.shield;
     }
 
     spawn(x, y) {
@@ -249,6 +467,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.setDisplaySize(200, 100);
 
         this.hp = 100;
+        this.shield = 100;
         this.energy = 0;
     }
 
@@ -271,38 +490,106 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     superShoot(blastGroup) {
-        if (this.energy == 100) {
+        if (this.energy >= 100) {
             blastGroup.fire(this.x + 50, this.y);
             this.energy = 0;
             this.scene.actualizeEnergyBar();
+            this.scene.hideSuperShootPrompt();
         }
-        
     }
 
     accumulateEnergy() {
+        this.energy += 5;
+        if (this.energy >= 100) {
+            this.scene.showSuperShootPrompt();
+            this.energy = 100;
+        }
+        this.scene.actualizeEnergyBar();
+    }
+
+    receiveHp(value){
+        this.hp += value;
+        if(this.hp >= 100){
+            this.hp = 100;
+        }
+        this.scene.actualizeHpBar();
+    }
+
+    receiveEnergy(value){
+        this.energy += value;
         if (this.energy >= 100) {
             this.energy = 100;
-            return;
         }
-        this.energy += 5;
         this.scene.actualizeEnergyBar();
+    }
+
+    receiveShield(value){
+        this.shield += value;
+        if (this.shield >= 100) {
+            this.shield = 100;
+        }
+        this.scene.actualizeShieldBar();
+    }
+
+    receiveBonus(bonusKey){
+
+        switch(bonusKey){
+
+            case "hpBonus":
+                this.receiveHp(15);
+            break;
+
+            case "energyBonus":
+                this.receiveEnergy(10);
+            break;
+
+            case "shieldBonus":
+                this.receiveShield(5);
+            break;
+
+        }
+
+    }
+
+    receiveDamage(value){
+
+        this.shield -= value;
+
+        if (this.shield < 0) {
+            this.hp += this.shield;
+            this.shield = 0;
+        }
+
+        if (this.hp <= 0) {
+
+            this.hp = 0;
+            this.scene.actualizeHpBar();
+            this.scene.actualizeShieldBar();
+            this.destroy();
+        }
+        this.scene.actualizeHpBar();
+        this.scene.actualizeShieldBar();
+    }
+
+    destroy(){
+
     }
 
 }
 
 class EnemyGroup extends Phaser.Physics.Arcade.Group {
 
-    constructor(scene) {
+    constructor(scene, type, key) {
         super(scene.physics.world, scene);
 
         this.createMultiple({
-            classType: Enemy,
+            classType: type,
             frameQuantity: 10,
             active: false,
             visible: false,
-            key: 'easyEnemy'
+            key: key
         });
-       
+
     }
 
     spawn(x, y) {
@@ -314,31 +601,155 @@ class EnemyGroup extends Phaser.Physics.Arcade.Group {
 
 }
 
+class EasyEnemyGroup extends EnemyGroup{
+
+    constructor(scene){
+        super(scene, EasyEnemy, 'easyEnemy');
+    }
+
+}
+
+class NormalEnemyGroup extends EnemyGroup{
+
+    constructor(scene){
+        super(scene, NormalEnemy, 'normalEnemy');
+    }
+
+}
+
+class HardEnemyGroup extends EnemyGroup{
+
+    constructor(scene){
+        super(scene, HardEnemy, 'hardEnemy');
+    }
+
+}
+
 class Enemy extends Phaser.Physics.Arcade.Sprite {
 
-    constructor(scene, x, y) {
-        super(scene, x, y, Phaser.Utils.Array.GetRandom(scene.easyEnemies));
+    constructor(scene, x, y, enemies) {
+        super(scene, x, y, Phaser.Utils.Array.GetRandom(enemies));
+        this.hp;
+        this.speed;
+        this.widthX;
+        this.heightY;
+        this.enable;
+        this.collisionDamage;
+        this.score;
+        this.ownTexture = this.texture.key;
     }
 
     spawn(x, y) {
+
+        this.anims.remove('blastExplo');
+        this.setTexture(this.ownTexture);
         this.body.reset(x, y); //Spawn point
         this.setActive(true);
         this.setVisible(true);
-        this.setVelocityX(-400); //Speed
-        this.setDisplaySize(50,100);
-        this.scaleX = -1;
+        this.setVelocityX(this.speed); //Speed
+        this.setDisplaySize(this.widthX, this.heightY);
+        this.flipX = true;
+        this.enable = true;
+    }
+
+    receiveDamage(value){
+        
+        this.hp -= value;
+        if(this.hp <= 0){
+            this.scene.score += this.score;
+            let randomValue = Math.floor(Math.random() * 10);
+            if(randomValue > 4)
+            this.scene.bonusGroup.spawn(this.x, this.y);
+            this.showDestroyAnim();
+        }
+    }
+
+    showDestroyAnim(){
+        this.enable = false;
+        this.setVelocityX(0);
+        this.anims.play('blastExplo', false); //Play animation
+        this.scene.time.addEvent({ delay: 500, callback: this.destroy, callbackScope: this, loop: false });
+    }
+
+    playerCollision(){
+        this.showDestroyAnim();
+    }
+
+    destroy(){
+        this.setActive(false);
+        this.setVisible(false);
+        this.body.reset(0, 0);
     }
 
     preUpdate(time, delta) { //Delete bullet behind window border
         super.preUpdate(time, delta);
 
+
+
         if (this.x <= 0) {
             this.setActive(false);
             this.setVisible(false);
+            this.body.reset(0, 0);
         }
     }
 
 }
+
+class EasyEnemy extends Enemy{
+
+    constructor(scene, x, y){
+        super(scene, x, y, scene.easyEnemies);
+    }
+
+    spawn(x, y){
+        this.hp = 30;
+        this.speed = -400;
+        this.widthX = 200;
+        this.heightY = 100;
+        this.collisionDamage = 50;
+        this.score = 20;
+        super.spawn(x, y);
+    }
+}
+
+class NormalEnemy extends Enemy{
+
+    constructor(scene, x, y){
+        super(scene, x, y, scene.normalEnemies);
+    }
+
+    spawn(x, y){
+        this.hp = 60;
+        this.speed = -250;
+        this.widthX = 300;
+        this.heightY = 150;
+        this.collisionDamage = 100;
+        this.score = 60;
+        super.spawn(x, y);
+    }
+}
+
+class HardEnemy extends Enemy{
+
+    constructor(scene, x, y){
+        super(scene, x, y, scene.hardEnemies);
+    }
+
+    spawn(x, y){
+        this.hp = 100;
+        this.speed = -190;
+        this.widthX = 400;
+        this.heightY = 200;
+        this.collisionDamage = 150;
+        this.score = 100;
+        super.spawn(x, y);
+    }
+}
+
+
+
+
+
 
 class BulletGroup extends Phaser.Physics.Arcade.Group {
 
@@ -347,7 +758,7 @@ class BulletGroup extends Phaser.Physics.Arcade.Group {
 
         this.createMultiple({
             classType: Bullet,
-            frameQuantity: 30,
+            frameQuantity: 50,
             active: false,
             visible: false,
             key: 'blueBullet'
@@ -367,16 +778,68 @@ class Bullet extends Phaser.Physics.Arcade.Sprite {
 
     constructor(scene, x, y) {
         super(scene, x, y, 'blueBullet');
+
+        this.enable;
     }
 
     fire(x, y) {
+
+        this.enable = true;
+
         this.body.reset(x, y); //Spawn point
         this.setActive(true);
         this.setVisible(true);
         this.setVelocityX(1000); //Speed
         this.anims.play('fly', true); //Play animation
         this.setDisplaySize(60, 20);
+        // this.once('animationcomplete', function(sprite){
+        //     console.log(sprite.key);
+        //     if(sprite.key === 'blueExplo'){
+        //         this.setActive(false);
+        //         this.setVisible(false);
+        //     }
+        // }, this);
+
+        // this.on('animationcomplete', function (animation, frame) {
+        //     if (animation.key == 'blueExplo') {
+        //         console.log("explo");
+        //         this.setActive(false);
+        //         this.setVisible(false);
+        //         this.setX(0);
+        //         this.setY(0);
+        //         //this.body.reset(x, y);
+        //     }
+        // }, this);
     }
+
+    explo() {
+        this.setVelocityX(0);
+        this.enable = false;
+        //this.setCollideWorldBounds(false);
+        //console.log("EXPLO");
+        this.anims.play('blueExplo', true); //Play animation
+        this.scene.time.addEvent({ delay: 200, callback: this.destroy, callbackScope: this, loop: false });
+        //this.disableBody(true, true);
+        // this.setActive(false);
+        // this.setVisible(false);
+        // this.body.reset(0, 0);
+    }
+
+    destroy(){
+        this.setActive(false);
+        this.setVisible(false);
+        this.setX(0);
+        this.setY(0);
+    }
+
+
+    //     on('animationcomplete', function (sprite)
+    // {
+    //   if (sprite.key === 'character_create')
+    //   {
+    //      character.play('character_repeat');
+    //   }
+    // }, this);
 
     preUpdate(time, delta) { //Delete bullet behind window border
         super.preUpdate(time, delta);
@@ -384,6 +847,7 @@ class Bullet extends Phaser.Physics.Arcade.Sprite {
         if (this.x >= window.innerWidth) {
             this.setActive(false);
             this.setVisible(false);
+
         }
     }
 
@@ -396,7 +860,7 @@ class BlastGroup extends Phaser.Physics.Arcade.Group {
 
         this.createMultiple({
             classType: Blast,
-            frameQuantity: 30,
+            frameQuantity: 15,
             active: false,
             visible: false,
             key: 'orangeBlast'
@@ -412,30 +876,116 @@ class BlastGroup extends Phaser.Physics.Arcade.Group {
 
 }
 
-class Blast extends Phaser.Physics.Arcade.Sprite{
+class Blast extends Phaser.Physics.Arcade.Sprite {
 
-constructor(scene, x, y){
-    super(scene, x, y, 'orangeBlast');
-}
+    constructor(scene, x, y) {
+        super(scene, x, y, 'orangeBlast');
+        this.enable;
+    }
 
-fire(x, y) {
-    this.body.reset(x, y); //Spawn point
-    this.setActive(true);
-    this.setVisible(true);
-    this.setVelocityX(500); //Speed
-    this.anims.play('blastFly', true); //Play animation
-    this.setDisplaySize(100, 50);
-    this.scaleX = -1;
-}
+    fire(x, y) {
 
-preUpdate(time, delta) { //Delete bullet behind window border
-    super.preUpdate(time, delta);
 
-    if (this.x >= window.innerWidth) {
+        this.enable = true;
+
+        this.body.reset(x, y); //Spawn point
+        this.setActive(true);
+        this.setVisible(true);
+        this.setVelocityX(500); //Speed
+        this.anims.play('blastFly', true); //Play animation
+        this.setDisplaySize(100, 50);
+        this.flipX = true;
+    }
+
+    explo() {
+        this.setDisplaySize(70, 70);
+        this.setVelocityX(0);
+        this.enable = false;
+        //this.setCollideWorldBounds(false);
+        //console.log("EXPLO");
+        this.anims.play('blastExplo', true); //Play animation
+        this.scene.time.addEvent({ delay: 500, callback: this.destroy, callbackScope: this, loop: false });
+        //this.disableBody(true, true);
+        // this.setActive(false);
+        // this.setVisible(false);
+        // this.body.reset(0, 0);
+    }
+
+    destroy(){
         this.setActive(false);
         this.setVisible(false);
+        this.setX(0);
+        this.setY(0);
     }
+
+    preUpdate(time, delta) { //Delete bullet behind window border
+        super.preUpdate(time, delta);
+
+        // if(this.x >= 500){
+        //     this.explo();
+        // }
+
+        if (this.x >= window.innerWidth) {
+            this.setActive(false);
+            this.setVisible(false);
+            this.body.reset(0, 0);
+        }
+    }
+
 }
+
+class BonusGroup extends Phaser.Physics.Arcade.Group {
+
+    constructor(scene) {
+        super(scene.physics.world, scene);
+
+        this.createMultiple({
+            classType: Bonus,
+            frameQuantity: 10,
+            active: false,
+            visible: false,
+            key: 'bonuses'
+        });
+
+    }
+
+    spawn(x, y) {
+        const bonus = Phaser.Utils.Array.GetRandom(Phaser.Utils.Array.GetAll(this.getChildren(), 'active', false));
+        if (bonus) {
+            bonus.spawn(x, y);
+        }
+    }
+
+}
+
+class Bonus extends Phaser.Physics.Arcade.Sprite {
+
+    constructor(scene, x, y) {
+        super(scene, x, y, Phaser.Utils.Array.GetRandom(scene.bonuses));
+    }
+
+    spawn(x, y) {
+
+        this.body.reset(x, y); //Spawn point
+        this.setActive(true);
+        this.setVisible(true);
+        this.setVelocityX(-400); //Speed
+        this.setDisplaySize(75, 75);
+    }
+
+    destroy(){
+        this.setActive(false);
+        this.setVisible(false);
+        this.body.reset(0, 0);
+    }
+
+    preUpdate(time, delta) { //Delete bullet behind window border
+        super.preUpdate(time, delta);
+
+        if (this.x <= 0) {
+            this.destroy();
+        }
+    }
 
 }
 
