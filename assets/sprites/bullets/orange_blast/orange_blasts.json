@@ -1,0 +1,125 @@
+{
+	"textures": [
+		{
+			"image": "orange_blasts.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 237,
+				"h": 325
+			},
+			"scale": 1,
+			"frames": [
+				{
+					"filename": "OrangeBlast__003.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 128,
+						"h": 182
+					},
+					"spriteSourceSize": {
+						"x": 6,
+						"y": 0,
+						"w": 105,
+						"h": 182
+					},
+					"frame": {
+						"x": 1,
+						"y": 1,
+						"w": 105,
+						"h": 182
+					}
+				},
+				{
+					"filename": "OrangeBlast__001.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 128,
+						"h": 182
+					},
+					"spriteSourceSize": {
+						"x": 3,
+						"y": 23,
+						"w": 108,
+						"h": 135
+					},
+					"frame": {
+						"x": 1,
+						"y": 185,
+						"w": 108,
+						"h": 135
+					}
+				},
+				{
+					"filename": "OrangeBlast__002.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 128,
+						"h": 182
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 15,
+						"w": 128,
+						"h": 155
+					},
+					"frame": {
+						"x": 108,
+						"y": 1,
+						"w": 128,
+						"h": 155
+					}
+				},
+				{
+					"filename": "OrangeBlast__000.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 128,
+						"h": 182
+					},
+					"spriteSourceSize": {
+						"x": 8,
+						"y": 43,
+						"w": 82,
+						"h": 94
+					},
+					"frame": {
+						"x": 111,
+						"y": 158,
+						"w": 82,
+						"h": 94
+					}
+				},
+				{
+					"filename": "OrangeBlast__004.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 128,
+						"h": 182
+					},
+					"spriteSourceSize": {
+						"x": 10,
+						"y": 56,
+						"w": 82,
+						"h": 70
+					},
+					"frame": {
+						"x": 111,
+						"y": 254,
+						"w": 82,
+						"h": 70
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:c00f38a24f32d176d4e7ec34adda686c:dffec2c9df2ba10ad41fc251ab37f7e6:02b270dbb1a536d0747748f165f89b1e$"
+	}
+}
