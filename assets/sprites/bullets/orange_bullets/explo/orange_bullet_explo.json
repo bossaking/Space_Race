@@ -1,0 +1,146 @@
+{
+	"textures": [
+		{
+			"image": "orange_bullet_explo.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 719,
+				"h": 255
+			},
+			"scale": 1,
+			"frames": [
+				{
+					"filename": "OrangeBulletExplo_6.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 228,
+						"h": 246
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 228,
+						"h": 246
+					},
+					"frame": {
+						"x": 1,
+						"y": 1,
+						"w": 228,
+						"h": 246
+					}
+				},
+				{
+					"filename": "OrangeBulletExplo_5.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 196,
+						"h": 196
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 196,
+						"h": 196
+					},
+					"frame": {
+						"x": 231,
+						"y": 1,
+						"w": 196,
+						"h": 196
+					}
+				},
+				{
+					"filename": "OrangeBulletExplo_4.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 149,
+						"h": 149
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 149,
+						"h": 149
+					},
+					"frame": {
+						"x": 429,
+						"y": 1,
+						"w": 149,
+						"h": 149
+					}
+				},
+				{
+					"filename": "OrangeBulletExplo_1.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 62,
+						"h": 62
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 62,
+						"h": 62
+					},
+					"frame": {
+						"x": 429,
+						"y": 152,
+						"w": 62,
+						"h": 62
+					}
+				},
+				{
+					"filename": "OrangeBulletExplo_3.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 138,
+						"h": 138
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 138,
+						"h": 138
+					},
+					"frame": {
+						"x": 580,
+						"y": 1,
+						"w": 138,
+						"h": 138
+					}
+				},
+				{
+					"filename": "OrangeBulletExplo_2.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 113,
+						"h": 113
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 113,
+						"h": 113
+					},
+					"frame": {
+						"x": 580,
+						"y": 141,
+						"w": 113,
+						"h": 113
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:f504596daa5bd901155cb9380fbe40aa:b7622288a974da0903d3c85de4e7bd0e:2aff60db3386209e6da1114f56f0799c$"
+	}
+}
