@@ -146,6 +146,9 @@ class MainScene extends Phaser.Scene {
         this.bg = this.add.image(windowWidth / 2, windowHeight / 2, 'backgrnd');
         this.bg.setDisplaySize(windowWidth, windowHeight);
 
+        if(window.localStorage.getItem('highScore')==undefined) this.highScore=0;
+        else this.highScore=window.localStorage.getItem('highScore');
+
         this.titleText=this.add.text(this.physics.world.bounds.centerX, 200, 'Space Race', {font:"80px Goblin One",fill:"yellow",align:"center"});
         this.titleText.setOrigin(0.5);
         this.titleText.visible=true;
@@ -155,10 +158,27 @@ class MainScene extends Phaser.Scene {
         this.initializeButton(this,'highScoreButton', 400, 'Najlepszy wynik');
         this.initializeButton(this,'infoButton', 500, 'Instrukcja');
         this.initializeButton(this,'backButton', 600, 'Powrot');
+        this.initializeButton(this, 'menuButton', 600, 'Menu');
+        
+        this.looseText=this.add.text(this.physics.world.bounds.centerX, 300, 'Przegrana!', {font:"80px Goblin One",fill:"red",align:"center"});
+        this.looseText.setOrigin(0.5);
+        this.looseText.visible=false;
+
+        this.bestScore = this.add.text(this.physics.world.bounds.centerX, 400, ' Gratulacje! Twój wynik jest najlepszy !', {font:"40px Goblin One",fill:"green",align:"center"})
+        this.bestScore.setOrigin(0.5);
+        this.bestScore.visible=false;
+
+        this.yourScore = this.add.text(this.physics.world.bounds.centerX, 500, 'Uzyskany wynik: ', {font:"40px Goblin One",fill:"white",align:"center"})
+        this.yourScore.setOrigin(0.5);
+        this.yourScore.visible=false;
+
         this.optionText=this.add.text(this.physics.world.bounds.centerX, this.physics.world.bounds.centerY+50,'Gra sklada sie z 3 poziomow.\n Przejscie do nastepnego poziomu nastepuje \n po zdobyciu 1000 pktow.\n Aby oddac strzal nalezy nacisnac Spacje.\nZmiane polozenia statku mozna kontrolowac \nza pomoca strzalek.',{font:"30px Goblin One",fill:"black",align:"center"});
         this.optionText.setOrigin(0.5);
         this.optionText.visible=false;
 
+        this.highScoreText=this.add.text(this.physics.world.bounds.centerX, this.physics.world.bounds.centerY+50, `Najlepszy wynik: ${this.highScore}`, {font:"30px Goblin One",fill:"black",align:"center"});
+        this.highScoreText.setOrigin(0.5);
+        this.highScoreText.visible=false;
 
         // this.asteroid = this.add.sprite(0,0,'asteroid');
         // this.asteroid.frame = 0;
@@ -296,19 +316,49 @@ class MainScene extends Phaser.Scene {
         .on('pointerout', () => item[name].setColor("white") )
         item[name].setOrigin(0.5);
         item[name].visible=true;
-        if(text==='Rozpocznij gre') item[name].setInteractive().on('pointerup', ()=>this.startGame());
-        else if(text==='Instrukcja') item[name].setInteractive().on('pointerup', ()=>this.showInstruction());
-        else if(text==='Powrot')
-        {
-            item[name].setInteractive().on('pointerup', ()=>this.goBackMenu());
-            item[name].visible=false;
-        } 
+        switch(name){
+            case 'startButton': 
+                item[name].setInteractive().on('pointerup', ()=>this.startGame());
+                break;
+            case 'highScoreButton':
+                item[name].setInteractive().on('pointerup', ()=>this.getHighScore());
+                break;
+            case 'infoButton':
+                item[name].setInteractive().on('pointerup', ()=>this.showInstruction());
+                break;
+            case 'backButton':
+                item[name].setInteractive().on('pointerup', ()=>this.goBackMenu());
+                item[name].visible=false;
+                break;
+            case 'menuButton':
+                item[name].setInteractive().on('pointerup', ()=>this.newScene());
+                item[name].visible=false;
+                break;
+        }
+    }
+
+    getHighScore(){
+        this.disableButtons();
+        this.highScoreText.visible=true;
+        this.backButton.visible=true;
+    }
+
+    newScene(){
+        //window.onload();
+        this.registry.destroy();
+        this.events.off();
+        this.scene.restart();
+        this.gameLevel=undefined;
     }
 
     goBackMenu(){
         this.enableButtons();
         this.optionText.visible=false;
+        this.highScoreText.visible=false;
         this.backButton.visible=false;
+        this.looseButton.visible=false;
+        this.menuButton.visible=false;
+        this.looseText.visible=false;
     }
 
     showInstruction(){
@@ -402,7 +452,6 @@ class MainScene extends Phaser.Scene {
     }
 
     spawnEnemy() {
-
         switch (this.gameLevel) {
 
             case undefined:
@@ -536,13 +585,30 @@ class MainScene extends Phaser.Scene {
 
     initializeLoopEvents() {
         //Loop calling increase score function
-        this.time.addEvent({ delay: 100, callback: this.increaseScore, callbackScope: this, loop: true });
+        this.event1 = this.time.addEvent({ delay: 100, callback: this.increaseScore, callbackScope: this, loop: true });
 
         //Loop calling increase player energy accumulate function
-        this.time.addEvent({ delay: 1000, callback: this.player.accumulateEnergy, callbackScope: this.player, loop: true });
+        this.event2 = this.time.addEvent({ delay: 1000, callback: this.player.accumulateEnergy, callbackScope: this.player, loop: true });
 
         // //Loop calling asteroid spawn
         // this.time.addEvent({ delay: 1500, callback: this.spawnAsteroid, callbackScope: this, loop: true });
+    }
+
+    stopLoopEvents(){
+        this.event1.remove();
+        this.event2.remove();
+        this.spawnEnemyEvent.remove();
+        this.enemyGroup.children.iterate((enemy)=>{if(enemy)this.enemyGroup.remove(enemy,true,true)});
+        this.scoreText.visible=false;
+        this.looseText.visible=true;
+        if(this.score>this.highScore)
+        {
+            this.bestScore.visible=true;
+            window.localStorage.setItem('highScore', this.score);
+        }
+        this.yourScore.setText(`Uzyskany wynik: ${this.score}`);
+        this.yourScore.visible=true;
+        this.menuButton.visible=true;
     }
 
     update() {
@@ -714,7 +780,9 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     destroy() {
-
+        this.disableBody(true,true);
+        //this.scene.time.remove();
+        this.scene.stopLoopEvents();
     }
 
 }
