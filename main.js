@@ -129,7 +129,6 @@ class MainScene extends Phaser.Scene {
 
     }
 
-
     create() {
 
         //window size
@@ -163,7 +162,6 @@ class MainScene extends Phaser.Scene {
         this.initializeShieldBar(windowWidth);
 
         this.initializeSpawnPoints();
-
 
         this.initializeColliders();
 
@@ -291,7 +289,7 @@ class MainScene extends Phaser.Scene {
     }
 
     orangeBlastPlayerHit(blast, enemy) {
-        if (blast.enable) {
+        if (blast.enable && enemy.enable) {
             enemy.receiveDamage(40);
             blast.explo();
         }
@@ -715,7 +713,9 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     spawn(x, y) {
         if (this.shootEvent !== undefined)
             this.shootEvent.remove(false);
+
         this.anims.remove('blastExplo');
+
         this.setTexture(this.ownTexture);
         this.body.reset(x, y); //Spawn point
         this.setActive(true);
@@ -765,9 +765,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         super.preUpdate(time, delta);
 
         if (this.x <= 0) {
-            this.setActive(false);
-            this.setVisible(false);
-            this.body.reset(0, 0);
+            this.destroy();
         }
     }
 
@@ -863,7 +861,6 @@ class Bullet extends Phaser.Physics.Arcade.Sprite {
         this.speed;
         this.widthX;
         this.heightY;
-        this.border;
         this.exploEvent;
         this.damage;
     }
@@ -923,11 +920,9 @@ class BlueBullet extends Bullet {
         if (this.x >= this.scene.windowWidth) {
             this.setActive(false);
             this.setVisible(false);
-
         }
     }
 }
-
 
 class OrangeBullet extends Bullet {
 
