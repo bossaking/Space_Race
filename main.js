@@ -11,8 +11,6 @@ class MainScene extends Phaser.Scene {
         this.normalEnemyGroup;
         this.hardEnemyGroup;
 
-
-
         this.spawnEnemyEvent;
 
         this.gameLevel;
@@ -49,6 +47,12 @@ class MainScene extends Phaser.Scene {
 
         this.asteroidGroup;
         this.asteroid;
+
+        this.titleText;
+        this.startButton;
+        this.highScoreButton;
+        this.infoButton;
+        this.endGameText;
     }
 
     preload() {
@@ -133,11 +137,28 @@ class MainScene extends Phaser.Scene {
 
         //window size
         var windowWidth = window.innerWidth;
-        var widnowHeight = window.innerHeight;
+        var windowHeight = window.innerHeight;
+
+        this.windowHeight=windowHeight;
+        this.windowWidth = windowWidth;
 
         //background sprite and size
-        this.bg = this.add.image(windowWidth / 2, widnowHeight / 2, 'backgrnd');
-        this.bg.setDisplaySize(windowWidth, widnowHeight);
+        this.bg = this.add.image(windowWidth / 2, windowHeight / 2, 'backgrnd');
+        this.bg.setDisplaySize(windowWidth, windowHeight);
+
+        this.titleText=this.add.text(this.physics.world.bounds.centerX, 200, 'Space Race', {font:"80px Goblin One",fill:"yellow",align:"center"});
+        this.titleText.setOrigin(0.5);
+        this.titleText.visible=true;
+
+        //this.add.image(this.physics.world.bounds.centerX,300,'butn').setDisplaySize(150,150);
+        this.initializeButton(this,'startButton', 300, 'Rozpocznij gre');
+        this.initializeButton(this,'highScoreButton', 400, 'Najlepszy wynik');
+        this.initializeButton(this,'infoButton', 500, 'Instrukcja');
+        this.initializeButton(this,'backButton', 600, 'Powrot');
+        this.optionText=this.add.text(this.physics.world.bounds.centerX, this.physics.world.bounds.centerY+50,'Gra sklada sie z 3 poziomow.\n Przejscie do nastepnego poziomu nastepuje \n po zdobyciu 1000 pktow.\n Aby oddac strzal nalezy nacisnac Spacje.\nZmiane polozenia statku mozna kontrolowac \nza pomoca strzalek.',{font:"30px Goblin One",fill:"black",align:"center"});
+        this.optionText.setOrigin(0.5);
+        this.optionText.visible=false;
+
 
         // this.asteroid = this.add.sprite(0,0,'asteroid');
         // this.asteroid.frame = 0;
@@ -153,19 +174,13 @@ class MainScene extends Phaser.Scene {
 
         // this.asteroidGroup = new AsteroidGroup(this);
 
-        this.initializePlayer(widnowHeight);
+        this.initializePlayer(windowHeight);
 
         this.initializeHpBar(windowWidth);
 
         this.initializeEnergyBar(windowWidth);
 
         this.initializeShieldBar(windowWidth);
-
-        this.initializeSpawnPoints();
-
-        this.initializeColliders();
-
-
 
         //Create player blue bullets animation
         this.anims.create({
@@ -259,6 +274,7 @@ class MainScene extends Phaser.Scene {
 
         //Create score text
         this.scoreText = this.add.text(windowWidth / 2 - 128, 32, 'Score: 0', { fontSize: '32px', fill: '#FFF', fontFamily: '"Goblin One", cursive' });
+        this.scoreText.visible=false;
 
         //Create super shoot prompt text
         this.superShootText = this.add.text(windowWidth / 2 - 400, 128, '', { fontSize: '32px', fill: '#e63410', fontFamily: '"Goblin One", cursive' });
@@ -267,10 +283,65 @@ class MainScene extends Phaser.Scene {
         this.levelText = this.add.text(800, 256, '', { fontSize: '64px', fill: '#e63410', fontFamily: '"Goblin One", cursive' });
         this.levelText.setOrigin(0.5);
 
+        //Przeniesione 
+        //this.initializeLoopEvents();
+        //this.spawnEnemy();
+
+    }
+
+    initializeButton(item,name, Y, text){
+        item[name] = this.add.text(this.physics.world.bounds.centerX, Y, text, { font:"35px Goblin One", fill:"#FFF", align:"center"})
+        .setInteractive({ useHandCursor: true })
+        .on('pointerover', () => item[name].setColor("lightgreen") )
+        .on('pointerout', () => item[name].setColor("white") )
+        item[name].setOrigin(0.5);
+        item[name].visible=true;
+        if(text==='Rozpocznij gre') item[name].setInteractive().on('pointerup', ()=>this.startGame());
+        else if(text==='Instrukcja') item[name].setInteractive().on('pointerup', ()=>this.showInstruction());
+        else if(text==='Powrot')
+        {
+            item[name].setInteractive().on('pointerup', ()=>this.goBackMenu());
+            item[name].visible=false;
+        } 
+    }
+
+    goBackMenu(){
+        this.enableButtons();
+        this.optionText.visible=false;
+        this.backButton.visible=false;
+    }
+
+    showInstruction(){
+        this.disableButtons();
+        this.optionText.visible=true;
+        this.backButton.visible=true;
+    }
+
+    startGame(){
+        this.disableButtons();
+        this.titleText.setText('');
+        this.player.visible=true;
+        this.hpBar.visible=true;
+        this.energyBar.visible=true;
+        this.shieldBar.visible=true;
+        this.scoreText.visible=true;
+        this.initializeSpawnPoints();
+        this.initializeColliders();
         this.initializeLoopEvents();
-
         this.spawnEnemy();
+        console.log(this.startButton);
+    }
 
+    enableButtons(){
+        this.startButton.visible=true;
+        this.highScoreButton.visible=true;
+        this.infoButton.visible=true;
+    }
+
+    disableButtons(){
+        this.startButton.visible=false;
+        this.highScoreButton.visible=false;
+        this.infoButton.visible=false;
     }
 
     initializeColliders() {
@@ -314,10 +385,10 @@ class MainScene extends Phaser.Scene {
         }
     }
 
-    initializePlayer(widnowHeight) {
+    initializePlayer(windowHeight) {
 
-        this.player = new Player(this, 250, widnowHeight / 2);
-        this.player.spawn(250, widnowHeight / 2);
+        this.player = new Player(this, 250, windowHeight / 2);
+        this.player.spawn(250, windowHeight / 2);
 
         //player move control
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -384,6 +455,7 @@ class MainScene extends Phaser.Scene {
         this.hpBar.fillRect(0, 0, 170, 30);
         this.hpBar.x = 145;
         this.hpBar.y = 35;
+        this.hpBar.visible=false;
 
         this.actualizeHpBar();
 
@@ -404,6 +476,7 @@ class MainScene extends Phaser.Scene {
         this.energyBar.fillRect(0, 0, 170, 30);
         this.energyBar.x = windowWidth - 310;
         this.energyBar.y = 35;
+        this.energyBar.visible=false;
 
         this.actualizeEnergyBar();
     }
@@ -423,6 +496,7 @@ class MainScene extends Phaser.Scene {
         this.shieldBar.fillRect(0, 0, 170, 30);
         this.shieldBar.x = 425;
         this.shieldBar.y = 35;
+        this.shieldBar.visible=false;
 
         this.actualizeShieldBar();
     }
@@ -530,7 +604,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     spawn(x, y) {
         this.body.reset(x, y);
         this.setActive(true);
-        this.setVisible(true);
+        this.setVisible(false);
         this.body.setCollideWorldBounds(true); //collision with borders
         this.setDisplaySize(200, 100);
 
@@ -1146,7 +1220,6 @@ class Bonus extends Phaser.Physics.Arcade.Sprite {
 // }
 
 window.onload = function () {
-
     config = {
         type: Phaser.AUTO,
         width: window.innerWidth,
